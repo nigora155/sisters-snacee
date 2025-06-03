@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Пиксельная Змея-Сердце</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f0f0f0;
+      overflow: hidden;
+    }.segment {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: hotpink;
+}
+
+  </style>
+</head>
+<body>
+  <script>
+    const segments = [];
+    const segmentCount = 25;
+    for (let i = 0; i < segmentCount; i++) {
+      const seg = document.createElement("div");
+      seg.className = "segment";
+      document.body.appendChild(seg);
+      segments.push({ el: seg, x: 100 - i * 22, y: 100 });
+    }let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+let heartMode = false;
+
+document.addEventListener("mousemove", e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+document.addEventListener("click", () => {
+  heartMode = !heartMode;
+  if (heartMode) makeHeart();
+});
+
+function makeHeart() {
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
+  const scale = 8;
+
+  for (let i = 0; i < segments.length; i++) {
+    const t = Math.PI * 2 * (i / segments.length);
+    const x = 16 * Math.pow(Math.sin(t), 3);
+    const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+    segments[i].x = centerX + x * scale;
+    segments[i].y = centerY - y * scale;
+  }
+}
+
+function animate() {
+  if (!heartMode) {
+    segments[0].x += (mouse.x - segments[0].x) * 0.2;
+    segments[0].y += (mouse.y - segments[0].y) * 0.2;
+
+    for (let i = 1; i < segments.length; i++) {
+      const prev = segments[i - 1];
+      const seg = segments[i];
+      const dx = prev.x - seg.x;
+      const dy = prev.y - seg.y;
+      const angle = Math.atan2(dy, dx);
+      const dist = 22;
+      seg.x = prev.x - Math.cos(angle) * dist;
+      seg.y = prev.y - Math.sin(angle) * dist;
+    }
+  }
+
+  for (const seg of segments) {
+    seg.el.style.left = seg.x + "px";
+    seg.el.style.top = seg.y + "px";
+  }
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+  </script>
+</body>
+</html>
